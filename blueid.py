@@ -3,7 +3,9 @@
 ###################################################################
 import hashlib
 import MySQLdb
+import random
 from random import randint
+from _random import Random
 
 # Database parameters
 host = "localhost"
@@ -37,7 +39,9 @@ class crud:
             #print "this is the session key: " + hashlib.sha224(hashy).hexdigest()
             if pwd == self.password:
                # return hashlib.sha224(hashy).hexdigest()
-               sql = "update blueid.users set stat=1 WHERE uid='%s';" % username
+               #GOKU TODO this changed
+               sKey = random.randrange(1000000,10000000)
+               sql = "update blueid.users set stat=1,skey=%s WHERE uid='%s';" %(sKey,username)
                cursor.execute(sql)
                db.commit()
                return "true"

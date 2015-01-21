@@ -6,7 +6,7 @@ import json
 import blueid
 
 # socket declaration
-HOST, PORT = "192.168.43.164", 9999
+HOST, PORT = "192.168.0.100", 9999
 
 
 class socketHandler(SocketServer.BaseRequestHandler):
