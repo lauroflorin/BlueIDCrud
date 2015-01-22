@@ -33,8 +33,9 @@ class socketHandler(SocketServer.BaseRequestHandler):
         if command == "login":
             isLoggedin = db.login(username,password)
             #self.request.sendall(self.data + '\n')
-            self.request.sendall(isLoggedin +'\n')
-            print "testing login " + isLoggedin
+            #TODO changed goku 
+            self.request.sendall(str(isLoggedin) +'\n')
+            print "testing login " + str(isLoggedin)
         else: #todo add logout
             if command == "logout":
                  isLoggedOut = db.logout(username)

@@ -44,7 +44,8 @@ class crud:
                sql = "update blueid.users set stat=1,skey=%s WHERE uid='%s';" %(sKey,username)
                cursor.execute(sql)
                db.commit()
-               return "true"
+               #return "true" #this changed to:
+               return sKey
             else:           
                return "false"
         except:
