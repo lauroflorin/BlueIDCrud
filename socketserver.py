@@ -6,10 +6,11 @@ import json
 import blueid
 
 # socket declaration
-HOST, PORT = "192.168.0.100", 9999
+HOST, PORT = "192.168.43.104", 9999
 
 
 class socketHandler(SocketServer.BaseRequestHandler):
+
     def handle(self):
         #self.request.sendall("connection initiated \r\n" + '\n')
         # self.request is the TCP socket connected to the client
@@ -23,27 +24,36 @@ class socketHandler(SocketServer.BaseRequestHandler):
         message = json.loads(self.data)
         command = message["command"]
         params = message["params"]
-        username = params["username"]
-        if command == "login":
-            password = params["password"]
-        else:
-            password = "none"
-
         db = blueid.crud()
+
         if command == "login":
+            username = params["username"]
+            password = params["password"]
             isLoggedin = db.login(username,password)
             #self.request.sendall(self.data + '\n')
-            #TODO changed goku 
+            #TODO changed goku
             self.request.sendall(str(isLoggedin) +'\n')
             print "testing login " + str(isLoggedin)
-        else: #todo add logout
-            if command == "logout":
-                 isLoggedOut = db.logout(username)
-                 self.request.sendall(isLoggedOut+'\n')
-        #self.request.sendall(self.data + '\n')         
 
-        #self.request.sendall(self.data.upper())
+        if command == "authorize":
+            uid = params["uid"]
+            did = params["did"]
+            gid = params["gid"]
+            cha = params["cha"]
+            skey = params["skey"]
+            ServerResponse = db.authorize(uid,did,gid,cha,skey)
+            #self.request.sendall(self.data + '\n')
+            #TODO changed goku
+            self.request.sendall(str(ServerResponse) +'\n')
 
+        if command == "writelog":
+            entry = params["entry"]
+            db.writelog(entry)
+
+        if command == "logout":
+            username = params["username"]
+            isLoggedOut = db.logout(username)
+            self.request.sendall(isLoggedOut+'\n')
 
 if __name__ == "__main__":
     db = blueid.crud()

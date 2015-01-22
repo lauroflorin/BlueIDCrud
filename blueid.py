@@ -10,7 +10,7 @@ from _random import Random
 # Database parameters
 host = "localhost"
 sql_server_user = "root"
-sql_server_password = ""
+sql_server_password = "7890uiOP"
 database = "blueid"
 
 class crud:
@@ -53,7 +53,45 @@ class crud:
            return "false"
            
         db.close()
-              
+
+    def authorize(self,uid,did,gid,cha,skey):
+        db = MySQLdb.connect(host,sql_server_user ,sql_server_password,database)
+        cursor = db.cursor()
+        print "::::::::::::::: authorizing :::::::::::::::"
+
+        self.uid = uid;
+        self.did = did;
+        self.gid = gid;
+        self.cha = cha;
+        self.skey = skey;
+
+        sql = "SELECT count(blueid.devices.did) FROM blueid.users INNER JOIN blueid.devices ON blueid.users.uid = blueid.devices.uid INNER JOIN blueid.devices_gates ON blueid.devices.did = blueid.devices_gates.did INNER JOIN blueid.gates ON blueid.devices_gates.gid = blueid.gates.gid WHERE blueid.users.stat = '1' AND blueid.gates.stat = '1' AND blueid.users.uid = '%s' AND blueid.users.skey = '%s' AND blueid.devices.did = '%s' AND blueid.gates.gid = '%s';" % (uid, skey, did, gid)
+        ## Step 1 - are all active and can device pass through gate
+        try:
+            cursor.execute(sql)
+            statementResults = cursor.fetchall()
+            for result in statementResults:
+                isAllowed = result[0]
+            print isAllowed
+        except:
+           print "query is fucked up for whatever reason"
+           isAllowed = 0
+
+        ## Step 2 - get gate key and generate response
+        print "Im in step2"
+        if isAllowed == 1:
+            sql ="SELECT gk FROM gates WHERE gid='%s';" % gid
+            cursor.execute(sql)
+            statementResults = cursor.fetchall()
+            for result in statementResults:
+                gkey = result[0]
+            print gkey
+            ServerResponse = gkey + cha + gid + did
+            return ServerResponse
+        else:
+            return "false"
+        db.close()
+
     def logout(self,username):
         db = MySQLdb.connect(host,sql_server_user ,sql_server_password,database)
         cursor = db.cursor()
@@ -74,7 +112,7 @@ class crud:
            return "false"
         db.close()
               
-              
+
 
     def initial_setup(self):
         db = MySQLdb.connect(host,sql_server_user ,sql_server_password,database)
@@ -89,7 +127,7 @@ class crud:
         except Exception as e:
              print "failed to execute1"  + e
              db.rollback()
-        
+
         sql = """SELECT * FROM blueid.users WHERE uid='admin'"""
         try:
             cursor.execute(sql)
