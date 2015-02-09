@@ -48,7 +48,7 @@ class socketHandler(SocketServer.BaseRequestHandler):
 
         if command == "writelog":
             entry = params["entry"]
-            db.writelog(entry)
+            db.write_log(entry)
 
         if command == "logout":
             username = params["username"]
@@ -63,3 +63,4 @@ if __name__ == "__main__":
     server = SocketServer.TCPServer((HOST, PORT), socketHandler)
     server.serve_forever()
     print "::::::::::::::: server running :::::::::::::::"
+

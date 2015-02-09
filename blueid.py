@@ -6,6 +6,7 @@ import MySQLdb
 import random
 from random import randint
 from _random import Random
+import time
 
 # Database parameters
 host = "localhost"
@@ -87,6 +88,7 @@ class crud:
                 gkey = result[0]
             print gkey
             ServerResponse = gkey + cha + gid + did
+            self.write_log(did,gid)
             return ServerResponse
         else:
             return "false"
@@ -112,7 +114,22 @@ class crud:
            return "false"
         db.close()
               
+    def write_log(self,did,gid):
+        print "I have reached the log method"
+        db = MySQLdb.connect(host,sql_server_user ,sql_server_password,database)
+        cursor = db.cursor()
+        act = "opened"
 
+        print """INSERT INTO access_log (gid,timestamp_date, timestamp_time, did, act) values (%s,CURRENT_DATE ,CURRENT_TIME ,%s,%s,)""" % (gid,did,act)
+        sql = """INSERT INTO access_log (gid,timestamp_date, timestamp_time, did, act) values ('%s',CURRENT_DATE ,CURRENT_TIME ,'%s','%s')""" % (gid,did,act)
+
+        try:
+              cursor.execute(sql)
+              db.commit()
+              print "log written"
+        except Exception as e:
+             print e
+             db.rollback()
 
     def initial_setup(self):
         db = MySQLdb.connect(host,sql_server_user ,sql_server_password,database)
